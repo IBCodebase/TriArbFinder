@@ -1,3 +1,7 @@
+import random
+import time
+
+from isArbatrageCoinbase import IsArbitrageCoinbase
 import requests
 
 class CTAScanner:
@@ -31,3 +35,30 @@ class CTAScanner:
             for item in currenciesList:
                 file.write(str(item + '\n'))
 
+    def getCodeFromList(self, lineNum):
+        with open("currentCurrenciesList", "r") as file:
+            content = file.readlines()
+            return content[lineNum].replace("\n","")
+
+    def getListLength(self):
+        with open("currentCurrenciesList", "r") as file:
+            content = file.readlines()
+            return len(content)
+
+    def randomCheck(self, secondsToRun):
+        timeLimit = time.time() + secondsToRun
+        listLength = self.getListLength()
+        while True:
+            currency1 = self.getCodeFromList(random.randint(0, listLength - 1))
+            currency2 = self.getCodeFromList(random.randint(0, listLength - 1))
+            currency3 = self.getCodeFromList(random.randint(0, listLength - 1))
+            print(currency1 + " " + currency2 + " " + currency3)
+            arbInstance = IsArbitrageCoinbase.isTriangularArbitrage(currency1, currency2, currency3)
+
+
+            if arbInstance > 1:
+                print(currency1 + ":" + currency2 + ":" + currency3 + "-" + str(arbInstance))
+
+            if timeLimit <= time.time():
+                break
+            time.sleep(1)
